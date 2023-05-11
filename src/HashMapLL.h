@@ -28,6 +28,7 @@ public:
 
     size_t getCapacity();
     size_t getSize();
+    float getLoadFactor();
 
     V put(const K &key, const V &value);
     V get(const K &key);
@@ -41,17 +42,17 @@ public:
 
 template <typename K, typename V, typename H>
 HashMapLL<K, V, H>::HashMapLL() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0)  {
-    _buckets = new HashNode<K, V> *[_capacity];
+    _buckets = new HashNode<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
 HashMapLL<K, V, H>::HashMapLL(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
-    _buckets = new HashNode<K, V> *[_capacity];
+    _buckets = new HashNode<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
 HashMapLL<K, V, H>::HashMapLL(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor), _size(0) {
-    _buckets = new HashNode<K, V> *[_capacity];
+    _buckets = new HashNode<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
@@ -65,6 +66,9 @@ size_t HashMapLL<K, V, H>::getCapacity() { return _capacity; }
 
 template <typename K, typename V, typename H>
 size_t HashMapLL<K, V, H>::getSize() { return _size; }
+
+template <typename K, typename V, typename H>
+float HashMapLL<K, V, H>::getLoadFactor() { return _loadFactor; }
 
 template <typename K, typename V, typename H>
 V HashMapLL<K, V, H>::put(const K &key, const V &value) {
@@ -164,10 +168,12 @@ void HashMapLL<K, V, H>::clear() {
         while (current != nullptr) {
             helper = current;
             current = current->getNext();
+
+            _size--;
             delete helper;
         }
+        _buckets[i] = nullptr;
     }
-    _size = 0;
 }
 
 template <typename K, typename V, typename H>
@@ -175,12 +181,12 @@ size_t HashMapLL<K, V, H>::threshold() { return static_cast<size_t>(_capacity * 
 
 template <typename K, typename V, typename H>
 void HashMapLL<K, V, H>::rehash() {
-    _capacity *= 2;
+    size_t prevCapacity = _capacity; _capacity *= 2;
     HashNode<K, V> **temp = _buckets;
-    _buckets = new HashNode<K, V> *[_capacity];
+    _buckets = new HashNode<K, V> *[_capacity]();
     _size = 0;
 
-    for (size_t i = 0; i < _capacity; i++) {
+    for (size_t i = 0; i < prevCapacity; i++) {
         HashNode<K, V> *current = temp[i];
         HashNode<K, V> *helper;
 
@@ -191,6 +197,5 @@ void HashMapLL<K, V, H>::rehash() {
             delete helper;
         }
     }
-
     delete []temp;
 }
