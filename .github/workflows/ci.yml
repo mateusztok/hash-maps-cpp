@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronized, reopened]
+
+jobs:
+  build-and-test:
+    name: "build and test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "setup cmake"
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.20'
+
+      - name: "use cmake"
+        run: cmake --version
+
+      - name: "build"
+        run: |
+          cmake -H. -B build
+          cmake --build build
+
+      - name: "unit tests"
+        run: cmake --build build --target test

@@ -11,11 +11,11 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(HashMapLLTest HashMapLL.test.cpp)
 add_executable(HashMapDHTest HashMapDH.test.cpp)
 
-set(ALL_EXAMPLE_TARGETS
+set(ALL_TARGETS
         HashMapLLTest
         HashMapDHTest
         )
 
-foreach( name ${ALL_EXAMPLE_TARGETS} )
-    target_link_libraries( ${name} Catch2 Catch2WithMain )
+foreach(name ${ALL_TARGETS})
+    target_link_libraries(${name} PRIVATE Catch2::Catch2WithMain)
 endforeach()
