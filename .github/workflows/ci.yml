@@ -17,9 +17,6 @@ jobs:
         with:
           cmake-version: '3.20'
 
-      - name: "use cmake"
-        run: cmake --version
-
       - name: "build"
         run: |
           cmake -H. -B build
