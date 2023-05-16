@@ -2,13 +2,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("example 2", "[example-test-2]") {
-    REQUIRE(1 == 1);
-}
-
 HashMapDH<int, int>* map;
 
-TEST_CASE("Creating HashMapLL of given capacities and load factors", "[HashMapDH]") {
+TEST_CASE("Creating HashMapDH of given capacities and load factors", "[HashMapDH]") {
     SECTION("Using default capacity") {
         map = new HashMapDH<int, int>();
         REQUIRE(map->isEmpty());
@@ -107,7 +103,7 @@ TEST_CASE("Removing from HashMapDH", "[HashMapDH]") {
         REQUIRE_FALSE(map->containsKey(1));
     }
 
-    SECTION("Clearing all elements in HashMapLL") {
+    SECTION("Clearing all elements in HashMapDH") {
         map->clear();
         REQUIRE(map->getSize() == 0);
     }
@@ -118,7 +114,7 @@ TEST_CASE("Removing from HashMapDH", "[HashMapDH]") {
     }
 }
 
-TEST_CASE("Rehashing HashMapLL after exceeded threshold", "[HashMapDH]") {
+TEST_CASE("Rehashing HashMapDH after exceeded threshold", "[HashMapDH]") {
     map = new HashMapDH<int, int>(6);
     map->put(1, 100);
     map->put(2, 200);
