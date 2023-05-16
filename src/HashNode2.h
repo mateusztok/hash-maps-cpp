@@ -7,6 +7,7 @@ private:
 	V _value;
 	char _status;   //'f'=free,'a'=accessed,'o'occupied
 public:
+	HashNode2();
 	HashNode2(const K& key, const V& value, const char& status);
 	~HashNode2();
 
@@ -17,6 +18,9 @@ public:
 	void setValue(V value);
 	void setStatus(char status);
 };
+template <typename K, typename V>
+HashNode2<K, V>::HashNode2() : _key(K()), _value(V()), _status('f') {}
+
 template <typename K, typename V>
 HashNode2<K, V>::HashNode2(const K& key, const V& value, const char& status) : _key(key), _value(value), _status('o') {}
 

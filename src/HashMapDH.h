@@ -56,7 +56,6 @@ HashMapDH<K, V, H, H2>::HashMapDH() : _capacity(DEFAULT_CAPACITY), _loadFactor(D
     _array = new HashNode2<K, V>[_capacity]();
 
     for (size_t i = 0; i < _capacity; i++) {
-        _array[i] = HashNode2<K, V>();
         _array[i].setStatus('f');
     }
 }
@@ -67,7 +66,6 @@ HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity) : _loadFactor(DEFAULT_LOAD_FA
     _array = new HashNode2<K, V>[_capacity];
 
     for (size_t i = 0; i < _capacity; i++) {
-        _array[i] = HashNode2<K, V>();
         _array[i].setStatus('f');
     }
 }
@@ -78,7 +76,6 @@ HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity, float loadFactor) : _loadFact
     _array = new HashNode2<K, V>[_capacity];
 
     for (size_t i = 0; i < _capacity; i++) {
-        _array[i] = HashNode2<K, V>();
         _array[i].setStatus('f');
     }
 }
@@ -196,7 +193,7 @@ bool HashMapDH<K, V, H, H2>::isEmpty() { return _size == 0; }
 template <typename K, typename V, typename H, typename H2 >
 void HashMapDH<K, V, H, H2>::clear() {
     delete[] _array;
-    HashMapDH<K, V, H, H2>::HashMap2(this->_capacity, this->_loadFactor);
+    HashMapDH<K, V, H, H2>::HashMapDH(this->_capacity, this->_loadFactor);
     _size = 0;
     _collision = 0;
 }
