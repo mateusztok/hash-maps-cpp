@@ -193,7 +193,7 @@ bool HashMapDH<K, V, H, H2>::isEmpty() { return _size == 0; }
 template <typename K, typename V, typename H, typename H2 >
 void HashMapDH<K, V, H, H2>::clear() {
     delete[] _array;
-    HashMapDH<K, V, H, H2>::HashMapDH(this->_capacity, this->_loadFactor);
+    HashMapDH(size_t capacity, float loadFactor);
     _size = 0;
     _collision = 0;
 }
