@@ -11,7 +11,7 @@ const size_t DEFAULT_CAPACITY = 31;
 const float DEFAULT_LOAD_FACTOR = 0.75f;
 
 template <typename K, typename V, typename H = Hasher<K>, typename H2 = Hasher2<K>>
-class HashMap2
+class HashMapDH
 {
 private:
     HashNode2<K, V>* _array;
@@ -29,10 +29,10 @@ private:
 
 
 public:
-    HashMap2();
-    explicit HashMap2(size_t capacity);
-    HashMap2(size_t capacity, float loadFactor);
-    ~HashMap2();
+    HashMapDH();
+    explicit HashMapDH(size_t capacity);
+    HashMapDH(size_t capacity, float loadFactor);
+    ~HashMapDH();
 
     size_t getCapacity();
     size_t getSize();
@@ -52,7 +52,7 @@ public:
 
 
 template <typename K, typename V, typename H, typename H2>
-HashMap2<K, V, H, H2>::HashMap2() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
+HashMapDH<K, V, H, H2>::HashMapDH() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _array = new HashNode2<K, V>[_capacity]();
 
     for (size_t i = 0; i < _capacity; i++) {
@@ -62,7 +62,7 @@ HashMap2<K, V, H, H2>::HashMap2() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEF
 }
 
 template <typename K, typename V, typename H, typename H2 >
-HashMap2<K, V, H, H2>::HashMap2(size_t capacity) : _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
+HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity) : _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _capacity = getNextPrime(capacity);
     _array = new HashNode2<K, V>[_capacity];
 
@@ -73,7 +73,7 @@ HashMap2<K, V, H, H2>::HashMap2(size_t capacity) : _loadFactor(DEFAULT_LOAD_FACT
 }
 
 template <typename K, typename V, typename H, typename H2 >
-HashMap2<K, V, H, H2>::HashMap2(size_t capacity, float loadFactor) : _loadFactor(loadFactor), _size(0) {
+HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity, float loadFactor) : _loadFactor(loadFactor), _size(0) {
     _capacity = getNextPrime(capacity);
     _array = new HashNode2<K, V>[_capacity];
 
@@ -84,21 +84,21 @@ HashMap2<K, V, H, H2>::HashMap2(size_t capacity, float loadFactor) : _loadFactor
 }
 
 template <typename K, typename V, typename H, typename H2 >
-HashMap2<K, V, H, H2>::~HashMap2() {
+HashMapDH<K, V, H, H2>::~HashMapDH() {
     delete[]_array;
 }
 
 template <typename K, typename V, typename H, typename H2 >
-size_t HashMap2<K, V, H, H2>::getCapacity() { return _capacity; }
+size_t HashMapDH<K, V, H, H2>::getCapacity() { return _capacity; }
 
 template <typename K, typename V, typename H, typename H2 >
-size_t HashMap2<K, V, H, H2>::getSize() { return _size; }
+size_t HashMapDH<K, V, H, H2>::getSize() { return _size; }
 
 template <typename K, typename V, typename H, typename H2 >
-float HashMap2<K, V, H, H2>::getLoadFactor() { return _loadFactor; }
+float HashMapDH<K, V, H, H2>::getLoadFactor() { return _loadFactor; }
 
 template <typename K, typename V, typename H, typename H2 >
-bool HashMap2<K, V, H, H2>::isPrime(int n) {
+bool HashMapDH<K, V, H, H2>::isPrime(int n) {
     if (n <= 1) return false;
     if (n <= 3) return true;
     if (n % 2 == 0 || n % 3 == 0) return false;
@@ -109,7 +109,7 @@ bool HashMap2<K, V, H, H2>::isPrime(int n) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-int HashMap2<K, V, H, H2>::getNextPrime(int capacity) {
+int HashMapDH<K, V, H, H2>::getNextPrime(int capacity) {
     if (capacity <= 1) return 2;
     int prime = capacity;
     bool found = false;
@@ -123,7 +123,7 @@ int HashMap2<K, V, H, H2>::getNextPrime(int capacity) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-V HashMap2<K, V, H, H2>::put(const K& key, const V& value) {
+V HashMapDH<K, V, H, H2>::put(const K& key, const V& value) {
     size_t hashValue = _hasher(key) % _capacity;
 
     while (_array[hashValue].getStatus() != 'f' && _array[hashValue].getStatus() != 'a' && _array[hashValue].getKey() != key) {
@@ -143,7 +143,7 @@ V HashMap2<K, V, H, H2>::put(const K& key, const V& value) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-V HashMap2<K, V, H, H2>::get(const K& key) {
+V HashMapDH<K, V, H, H2>::get(const K& key) {
     size_t hashValue = _hasher(key) % _capacity;
     while (_array[hashValue].getStatus() != 'f') {
         if (_array[hashValue].getKey() == key) {
@@ -155,7 +155,7 @@ V HashMap2<K, V, H, H2>::get(const K& key) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-V HashMap2<K, V, H, H2>::remove(const K& key) {
+V HashMapDH<K, V, H, H2>::remove(const K& key) {
     int hashValue = _hasher(key) % _capacity;
 
     while (_array[hashValue].getStatus() != 'f') {
@@ -173,12 +173,12 @@ V HashMap2<K, V, H, H2>::remove(const K& key) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-int HashMap2<K, V, H, H2>::getCollision() {
+int HashMapDH<K, V, H, H2>::getCollision() {
     return _collision;
 }
 
 template <typename K, typename V, typename H, typename H2 >
-bool HashMap2<K, V, H, H2>::containsKey(const K& key) {
+bool HashMapDH<K, V, H, H2>::containsKey(const K& key) {
     size_t hashValue = _hasher(key) % _capacity;
 
     while (_array[hashValue].getStatus() != 'f') {
@@ -191,21 +191,21 @@ bool HashMap2<K, V, H, H2>::containsKey(const K& key) {
 }
 
 template <typename K, typename V, typename H, typename H2 >
-bool HashMap2<K, V, H, H2>::isEmpty() { return _size == 0; }
+bool HashMapDH<K, V, H, H2>::isEmpty() { return _size == 0; }
 
 template <typename K, typename V, typename H, typename H2 >
-void HashMap2<K, V, H, H2>::clear() {
+void HashMapDH<K, V, H, H2>::clear() {
     delete[] _array;
-    HashMap2<K, V, H, H2>::HashMap2(this->_capacity, this->_loadFactor);
+    HashMapDH<K, V, H, H2>::HashMap2(this->_capacity, this->_loadFactor);
     _size = 0;
     _collision = 0;
 }
 
 template <typename K, typename V, typename H, typename H2 >
-size_t HashMap2<K, V, H, H2>::threshold() { return static_cast<size_t>(_capacity * _loadFactor); }
+size_t HashMapDH<K, V, H, H2>::threshold() { return static_cast<size_t>(_capacity * _loadFactor); }
 
 template <typename K, typename V, typename H, typename H2 >
-void HashMap2<K, V, H, H2>::rehash() {
+void HashMapDH<K, V, H, H2>::rehash() {
     size_t prevCapacity = _capacity;
     _capacity = getNextPrime(_capacity * 2);
     HashNode2<K, V>* temp = _array;
