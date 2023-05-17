@@ -64,8 +64,8 @@ HashMapRH<K, V, H>::HashMapRH(size_t capacity, float loadFactor) : _capacity(cap
 
 template <typename K, typename V, typename H>
 HashMapRH<K, V, H>::~HashMapRH() {
-    if (!this->isEmpty()) this->clear();
-    delete []_buckets;
+     if (!this->isEmpty()) this->clear();
+     delete []_buckets;
 }
 
 template <typename K, typename V, typename H>
@@ -86,7 +86,7 @@ V HashMapRH<K, V, H>::put(const K &key, const V &value) {
 
     size_t itr = 0; size_t idx;
     while (itr < _capacity) {
-        idx = hashValue + itr % _capacity;
+        idx = (hashValue + itr) % _capacity;
         current = _buckets[idx];
 
         _totalCost++;
@@ -102,7 +102,7 @@ V HashMapRH<K, V, H>::put(const K &key, const V &value) {
 
         if (current->getKey() == key) break;
 
-        if (current->getPSL() < entry->getPSL()) std::swap(current, entry);
+        if (current->getPSL() < entry->getPSL()) std::swap(_buckets[idx], entry);
         entry->setPSL(entry->getPSL() + 1);
         itr++;
     }
@@ -158,6 +158,8 @@ bool HashMapRH<K, V, H>::isEmpty() { return _size == 0; }
 
 template<typename K, typename V, typename H>
 int HashMapRH<K, V, H>::search(const K &key) {
+    if (this->isEmpty()) return -1;
+
     size_t hashValue = _hasher(key) % _capacity;
     HashMapEntryRH<K, V> *current;
     auto mean = static_cast<size_t>(std::round(_totalCost / _size));
@@ -167,11 +169,11 @@ int HashMapRH<K, V, H>::search(const K &key) {
     size_t idx;
 
     while (down >= 1 && up <= _longestPSL + 1) {
-        idx = hashValue + down - 1 % _capacity;
+        idx = (hashValue + down - 1) % _capacity;
         current = _buckets[idx];
         if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
 
-        idx = hashValue + up - 1 % _capacity;
+        idx = (hashValue + up - 1) % _capacity;
         current = _buckets[idx];
         if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
 
@@ -180,14 +182,14 @@ int HashMapRH<K, V, H>::search(const K &key) {
     }
 
     while (down >= 1) {
-        idx = hashValue + down - 1 % _capacity;
+        idx = (hashValue + down - 1) % _capacity;
         current = _buckets[idx];
         if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
         down--;
     }
 
     while (up <= _longestPSL + 1) {
-        idx = hashValue + up - 1 % _capacity;
+        idx = (hashValue + up - 1) % _capacity;
         current = _buckets[idx];
         if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
         up++;
