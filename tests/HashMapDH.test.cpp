@@ -32,7 +32,7 @@ TEST_CASE("Adding and getting elements from HashMapDH", "[HashMapDH]") {
         map->put(1, 100);
         map->put(2, 200);
 
-        REQUIRE_FALSE(map->isEmpty());
+      REQUIRE_FALSE(map->isEmpty());
         REQUIRE(map->getSize() == 2);
         REQUIRE(map->get(1) == 100);
         REQUIRE(map->get(2) == 200);
@@ -49,8 +49,8 @@ TEST_CASE("Adding and getting elements from HashMapDH", "[HashMapDH]") {
         map->put(63, 10000);
 
         REQUIRE(map->get(1) == 100);
-        REQUIRE(map->get(33) == 1000);
-        REQUIRE(map->get(65) == 10000);
+        REQUIRE(map->get(32) == 1000);
+        REQUIRE(map->get(63) == 10000);
     }
 
     SECTION("Exception when getting non existing elements") {
@@ -63,7 +63,7 @@ TEST_CASE("Adding and getting elements from HashMapDH", "[HashMapDH]") {
         map->put(33, 1000);
         map->put(2, 200);
         map->clear();
-
+        
         map->put(1, 100);
         REQUIRE(map->get(1) == 100);
 
@@ -109,8 +109,8 @@ TEST_CASE("Removing from HashMapDH", "[HashMapDH]") {
     }
 
     SECTION("Removing elements that does not exist") {
-        REQUIRE_THROWS_AS(map->remove(1000), std::out_of_range);
-        REQUIRE_THROWS_AS(map->remove(5000), std::out_of_range);
+       REQUIRE_THROWS_AS(map->remove(1000), std::out_of_range);
+       REQUIRE_THROWS_AS(map->remove(5000), std::out_of_range);
     }
 }
 
@@ -119,8 +119,8 @@ TEST_CASE("Rehashing HashMapDH after exceeded threshold", "[HashMapDH]") {
     map->put(1, 100);
     map->put(2, 200);
     map->put(3, 300);
-    map->put(4, 400);
-
+    map->put(4, 400); 
+    
     SECTION("Rehashing without collisions") {
         map->put(5, 500);
         map->put(6, 600);

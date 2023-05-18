@@ -27,7 +27,6 @@ private:
     int getNextPrime(int capacity);
     bool isPrime(int n);
 
-
 public:
     HashMapDH();
     explicit HashMapDH(size_t capacity);
@@ -116,26 +115,26 @@ int HashMapDH<K, V, H, H2>::getNextPrime(int capacity) {
         }
         prime++;
     }
-    return prime;
+    return prime-1;
 }
 
 template <typename K, typename V, typename H, typename H2 >
 V HashMapDH<K, V, H, H2>::put(const K& key, const V& value) {
     size_t hashValue = _hasher(key) % _capacity;
 
-    while (_array[hashValue].getStatus() != 'f' && _array[hashValue].getStatus() != 'a' && _array[hashValue].getKey() != key) {
+    while (_array[hashValue].getStatus() != 'f'){
+        if (_array[hashValue].getKey() == key) { break; }
         _collision = _collision + 1;
-        hashValue = (hashValue + _hasher2(key) % (_capacity - 1)) % _capacity;
+        hashValue = (hashValue + (_hasher2(key) % (_capacity - 1))) % _capacity;
     }
-
-    _array[hashValue] = HashNode2<K, V>(key, value);
     if (_array[hashValue].getKey() != key) {
+        _array[hashValue] = HashNode2<K, V>(key, value);
         _size++;
         if (this->threshold() < _size) { this->rehash(); }
-        return V();
+        return V(0);
     }
-
     V rtnValue = _array[hashValue].getValue();
+    _array[hashValue].setValue(value);
     return rtnValue;
 }
 
@@ -193,13 +192,18 @@ bool HashMapDH<K, V, H, H2>::isEmpty() { return _size == 0; }
 template <typename K, typename V, typename H, typename H2 >
 void HashMapDH<K, V, H, H2>::clear() {
     delete[] _array;
-    HashMapDH(_capacity, _loadFactor);
+    _array = new HashNode2<K, V>[_capacity]();
+
+    for (size_t i = 0; i < _capacity; i++) {
+        _array[i].setStatus('f');
+    }
     _size = 0;
     _collision = 0;
 }
 
 template <typename K, typename V, typename H, typename H2 >
-size_t HashMapDH<K, V, H, H2>::threshold() { return static_cast<size_t>(_capacity * _loadFactor); }
+size_t HashMapDH<K, V, H, H2>::threshold() { return static_cast<size_t>(_capacity * _loadFactor); 
+     }
 
 template <typename K, typename V, typename H, typename H2 >
 void HashMapDH<K, V, H, H2>::rehash() {
@@ -215,7 +219,7 @@ void HashMapDH<K, V, H, H2>::rehash() {
 
     for (size_t i = 0; i < prevCapacity; i++) {
 
-        while (temp[i].getStatus() == 'o') {
+        if (temp[i].getStatus() == 'o') {
             this->put(temp[i].getKey(), temp[i].getValue());
         }
     }
