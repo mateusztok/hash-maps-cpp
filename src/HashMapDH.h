@@ -20,7 +20,8 @@ private:
     size_t _capacity;
     float _loadFactor;
     size_t _size;
-    int _collision = 0;
+    size_t _collision = 0;
+    size_t _how_much_free;
 
     size_t threshold();
     void rehash();
@@ -53,30 +54,21 @@ public:
 template <typename K, typename V, typename H, typename H2>
 HashMapDH<K, V, H, H2>::HashMapDH() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _array = new HashNode2<K, V>[_capacity]();
-
-    for (size_t i = 0; i < _capacity; i++) {
-        _array[i].setStatus('f');
-    }
+    _how_much_free = _capacity;
 }
 
 template <typename K, typename V, typename H, typename H2 >
 HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity) : _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _capacity = getNextPrime(capacity);
     _array = new HashNode2<K, V>[_capacity];
-
-    for (size_t i = 0; i < _capacity; i++) {
-        _array[i].setStatus('f');
-    }
+    _how_much_free = _capacity;
 }
 
 template <typename K, typename V, typename H, typename H2 >
 HashMapDH<K, V, H, H2>::HashMapDH(size_t capacity, float loadFactor) : _loadFactor(loadFactor), _size(0) {
     _capacity = getNextPrime(capacity);
     _array = new HashNode2<K, V>[_capacity];
-
-    for (size_t i = 0; i < _capacity; i++) {
-        _array[i].setStatus('f');
-    }
+    _how_much_free = _capacity;
 }
 
 template <typename K, typename V, typename H, typename H2 >
@@ -121,16 +113,25 @@ int HashMapDH<K, V, H, H2>::getNextPrime(int capacity) {
 template <typename K, typename V, typename H, typename H2 >
 V HashMapDH<K, V, H, H2>::put(const K& key, const V& value) {
     size_t hashValue = _hasher(key) % _capacity;
+    size_t first_a=-1;
 
-    while (_array[hashValue].getStatus() != 'f'){
-        if (_array[hashValue].getKey() == key) { break; }
+    while (_array[hashValue].getStatus() != 'f' && _array[hashValue].getKey() != key){
+        if (_array[hashValue].getStatus() == 'a' && first_a == -1) {  first_a = hashValue; }
+
         _collision = _collision + 1;
         hashValue = (hashValue + (_hasher2(key) % (_capacity - 1))) % _capacity;
     }
     if (_array[hashValue].getKey() != key) {
+        if (first_a != -1) {
+            _array[first_a] = HashNode2<K, V>(key, value);
+            _size++;
+            return V(0);
+        }
         _array[hashValue] = HashNode2<K, V>(key, value);
         _size++;
-        if (this->threshold() < _size) { this->rehash(); }
+        _how_much_free--;
+        if (_capacity - this->threshold() >= _how_much_free) { this->rehash(); }
+
         return V(0);
     }
     V rtnValue = _array[hashValue].getValue();
@@ -212,6 +213,7 @@ void HashMapDH<K, V, H, H2>::rehash() {
     HashNode2<K, V>* temp = _array;
     _array = new HashNode2<K, V>[_capacity]();
     _size = 0;
+    _how_much_free = _capacity;
 
     for (size_t i = 0; i < _capacity; i++) {
         _array[i].setStatus('f');

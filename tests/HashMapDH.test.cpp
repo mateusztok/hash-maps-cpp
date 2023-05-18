@@ -101,6 +101,7 @@ TEST_CASE("Removing from HashMapDH", "[HashMapDH]") {
 
         map->remove(1);
         REQUIRE_FALSE(map->containsKey(1));
+        REQUIRE(map->getSize() == 3);
     }
 
     SECTION("Clearing all elements in HashMapDH") {
@@ -109,8 +110,34 @@ TEST_CASE("Removing from HashMapDH", "[HashMapDH]") {
     }
 
     SECTION("Removing elements that does not exist") {
-       REQUIRE_THROWS_AS(map->remove(1000), std::out_of_range);
-       REQUIRE_THROWS_AS(map->remove(5000), std::out_of_range);
+        REQUIRE_THROWS_AS(map->remove(1000), std::out_of_range);
+        REQUIRE_THROWS_AS(map->remove(5000), std::out_of_range);
+    }
+}
+
+TEST_CASE("", "[HashMapDH]") {
+    map = new HashMapDH<int, int>(6);
+    SECTION("Elements that did not cause a collision") {
+ 
+        for (size_t i = 1; i < 100; i++)
+        {
+            map->put(i, 100 * i);
+        }
+
+        for (size_t i = 1; i < 100; i++)
+        {
+            map->remove(i);
+        }
+
+        REQUIRE(map->getSize() == 0);
+        
+        for (size_t i = 0; i < 100; i++)
+        {
+            map->put(i, 100 * i);
+        }
+
+        REQUIRE(map->getCapacity() == 163);
+        REQUIRE(map->getSize() == 99);
     }
 }
 
@@ -119,7 +146,7 @@ TEST_CASE("Rehashing HashMapDH after exceeded threshold", "[HashMapDH]") {
     map->put(1, 100);
     map->put(2, 200);
     map->put(3, 300);
-    map->put(4, 400); 
+    map->put(4, 400);
     
     SECTION("Rehashing without collisions") {
         map->put(5, 500);
