@@ -17,9 +17,6 @@ private:
     float _loadFactor;
     size_t _size;
 
-    size_t _longestPSL;
-    size_t _totalCost;
-
     size_t threshold();
     int search(const K &key);
     void rehash();
@@ -45,20 +42,17 @@ public:
 };
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0),
-                                _longestPSL(0), _totalCost(0) {
+HashMapRH<K, V, H>::HashMapRH() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0),
-                                                _longestPSL(0), _totalCost(0) {
+HashMapRH<K, V, H>::HashMapRH(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor),
-                                                                _size(0), _longestPSL(0), _totalCost(0) {
+HashMapRH<K, V, H>::HashMapRH(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor), _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
@@ -89,14 +83,11 @@ V HashMapRH<K, V, H>::put(const K &key, const V &value) {
         idx = (hashValue + itr) % _capacity;
         current = _buckets[idx];
 
-        _totalCost++;
-
         if (current == nullptr) {
             _buckets[idx] = entry;
             _size++;
-            _longestPSL = std::max(entry->getPSL(), _longestPSL);
 
-            if (this->threshold() < _size) { this->rehash(); }
+            if (this->threshold() < _size) this->rehash();
             return V();
         }
 
@@ -107,7 +98,6 @@ V HashMapRH<K, V, H>::put(const K &key, const V &value) {
         itr++;
     }
 
-    _totalCost -= itr + 1;
     V rtnValue = current->getValue();
     current->setValue(value);
     return rtnValue;
@@ -119,17 +109,6 @@ V HashMapRH<K, V, H>::get(const K &key) {
 
     if (idx != -1) return _buckets[idx]->getValue();
     throw std::out_of_range("KeyError: Given key does not exist in map");
-
-//    size_t itr = 0; size_t idx;
-//    while (itr < _capacity) {
-//        idx = hashValue + itr;
-//        if (idx >= _capacity) idx -= _capacity;
-//        current = _buckets[idx];
-//
-//        if (current != nullptr && current->getKey() == key) return current->getValue();
-//        itr++;
-//    }
-
 }
 
 template <typename K, typename V, typename H>
@@ -137,20 +116,27 @@ V HashMapRH<K, V, H>::remove(const K &key) {
     int idx = this->search(key);
     if (idx == -1) throw std::out_of_range("KeyError: Given key does not exist in map");
 
-    HashMapEntryRH<K, V> *current = _buckets[idx];
-    V rtnValue = current->getValue();
-    delete current;
+    V rtnValue = _buckets[idx]->getValue();
+    _size--;
 
-    int next = idx + 1;
-    // TODO: Left shift after deletion
+    size_t itr = idx + 1;
+    HashMapEntryRH<K, V> *next = _buckets[itr % _capacity];
+    while (next != nullptr && next->getPSL() > 0) {
+        next->setPSL(next->getPSL() - 1);
+
+        std::swap(_buckets[(itr - 1) % _capacity], next);
+        itr++;
+        next = _buckets[itr % _capacity];
+    }
+    _buckets[itr - 1] = nullptr;
 
     return rtnValue;
 }
 
 template <typename K, typename V, typename H>
 bool HashMapRH<K, V, H>::containsKey(const K &key) {
-    if (this->search(key) != -1) return true;
-    return false;
+    if (this->search(key) == -1) return false;
+    return true;
 }
 
 template <typename K, typename V, typename H>
@@ -162,37 +148,16 @@ int HashMapRH<K, V, H>::search(const K &key) {
 
     size_t hashValue = _hasher(key) % _capacity;
     HashMapEntryRH<K, V> *current;
-    auto mean = static_cast<size_t>(std::round(_totalCost / _size));
 
-    size_t down = mean;
-    size_t up = down + 1;
-    size_t idx;
-
-    while (down >= 1 && up <= _longestPSL + 1) {
-        idx = (hashValue + down - 1) % _capacity;
+    size_t itr = 0; size_t idx;
+    while (itr < _capacity) {
+        idx = (hashValue + itr) % _capacity;
         current = _buckets[idx];
-        if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
 
-        idx = (hashValue + up - 1) % _capacity;
-        current = _buckets[idx];
-        if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
-
-        down--;
-        up++;
-    }
-
-    while (down >= 1) {
-        idx = (hashValue + down - 1) % _capacity;
-        current = _buckets[idx];
-        if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
-        down--;
-    }
-
-    while (up <= _longestPSL + 1) {
-        idx = (hashValue + up - 1) % _capacity;
-        current = _buckets[idx];
-        if (current != nullptr && current->getKey() == key) return static_cast<int>(idx);
-        up++;
+        if (current == nullptr) break;
+        if (itr > current->getPSL()) break;
+        if (current->getKey() == key) return static_cast<int>(idx);
+        itr++;
     }
 
     return -1;
@@ -214,4 +179,18 @@ template <typename K, typename V, typename H>
 size_t HashMapRH<K, V, H>::threshold() { return static_cast<size_t>(_capacity * _loadFactor); }
 
 template <typename K, typename V, typename H>
-void HashMapRH<K, V, H>::rehash() { }
+void HashMapRH<K, V, H>::rehash() {
+    size_t prevCapacity = _capacity; _capacity *= 2;
+    HashMapEntryRH<K, V> **temp = _buckets;
+    _buckets = new HashMapEntryRH<K, V> *[_capacity]();
+    _size = 0;
+
+    for (size_t i = 0; i < prevCapacity; i++) {
+        HashMapEntryRH<K, V> *current = temp[i];
+        if (current != nullptr) {
+            this->put(current->getKey(), current->getValue());
+            delete current;
+        }
+    }
+    delete []temp;
+}
