@@ -2,11 +2,9 @@
 
 #include "HashMapEntryLL.h"
 #include "Hasher.h"
+#include "Constants.h"
 
 #include <iostream>
-
-const size_t DEFAULT_CAPACITY = 32;
-const float DEFAULT_LOAD_FACTOR = 0.75f;
 
 template <typename K, typename V, typename H = Hasher<K>>
 class HashMapLL {
@@ -41,12 +39,14 @@ public:
 };
 
 template <typename K, typename V, typename H>
-HashMapLL<K, V, H>::HashMapLL() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0)  {
+HashMapLL<K, V, H>::HashMapLL() : _capacity(constants::DEFAULT_CAPACITY), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                _size(0)  {
     _buckets = new HashMapEntryLL<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapLL<K, V, H>::HashMapLL(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
+HashMapLL<K, V, H>::HashMapLL(size_t capacity) : _capacity(capacity), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                                _size(0) {
     _buckets = new HashMapEntryLL<K, V> *[_capacity]();
 }
 

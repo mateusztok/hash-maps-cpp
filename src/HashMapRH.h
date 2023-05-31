@@ -2,11 +2,9 @@
 
 #include "HashMapEntryRH.h"
 #include "Hasher.h"
+#include "Constants.h"
 
 #include <cmath>
-
-const size_t DEFAULT_CAPACITY = 32;
-const float DEFAULT_LOAD_FACTOR = 0.75f;
 
 template <typename K, typename V, typename H = Hasher<K>>
 class HashMapRH {
@@ -42,17 +40,20 @@ public:
 };
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
+HashMapRH<K, V, H>::HashMapRH() : _capacity(constants::DEFAULT_CAPACITY), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
+HashMapRH<K, V, H>::HashMapRH(size_t capacity) : _capacity(capacity), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                                _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapRH<K, V, H>::HashMapRH(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor), _size(0) {
+HashMapRH<K, V, H>::HashMapRH(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor),
+                                                                    _size(0) {
     _buckets = new HashMapEntryRH<K, V> *[_capacity]();
 }
 
@@ -117,6 +118,7 @@ V HashMapRH<K, V, H>::remove(const K &key) {
     if (idx == -1) throw std::out_of_range("KeyError: Given key does not exist in map");
 
     V rtnValue = _buckets[idx]->getValue();
+    delete _buckets[idx];
     _size--;
 
     size_t itr = idx + 1;
