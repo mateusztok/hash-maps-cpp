@@ -10,10 +10,12 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(HashMapLLTest HashMapLL.test.cpp)
 add_executable(HashMapDHTest HashMapDH.test.cpp)
+add_executable(HashMapRHTest HashMapRH.test.cpp)
 
 set(ALL_TARGETS
         HashMapLLTest
         HashMapDHTest
+        HashMapRHTest
         )
 
 foreach(name ${ALL_TARGETS})
