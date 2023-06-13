@@ -1,17 +1,15 @@
 #pragma once
 
-#include "HashNode.h"
+#include "HashMapEntryLL.h"
 #include "Hasher.h"
+#include "Constants.h"
 
 #include <iostream>
-
-const size_t DEFAULT_CAPACITY = 32;
-const float DEFAULT_LOAD_FACTOR = 0.75f;
 
 template <typename K, typename V, typename H = Hasher<K>>
 class HashMapLL {
 private:
-    HashNode<K, V> **_buckets;
+    HashMapEntryLL<K, V> **_buckets;
     H _hasher;
     size_t _capacity;
     float _loadFactor;
@@ -41,18 +39,20 @@ public:
 };
 
 template <typename K, typename V, typename H>
-HashMapLL<K, V, H>::HashMapLL() : _capacity(DEFAULT_CAPACITY), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0)  {
-    _buckets = new HashNode<K, V> *[_capacity]();
+HashMapLL<K, V, H>::HashMapLL() : _capacity(constants::DEFAULT_CAPACITY), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                _size(0)  {
+    _buckets = new HashMapEntryLL<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
-HashMapLL<K, V, H>::HashMapLL(size_t capacity) : _capacity(capacity), _loadFactor(DEFAULT_LOAD_FACTOR), _size(0) {
-    _buckets = new HashNode<K, V> *[_capacity]();
+HashMapLL<K, V, H>::HashMapLL(size_t capacity) : _capacity(capacity), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
+                                                _size(0) {
+    _buckets = new HashMapEntryLL<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
 HashMapLL<K, V, H>::HashMapLL(size_t capacity, float loadFactor) : _capacity(capacity), _loadFactor(loadFactor), _size(0) {
-    _buckets = new HashNode<K, V> *[_capacity]();
+    _buckets = new HashMapEntryLL<K, V> *[_capacity]();
 }
 
 template <typename K, typename V, typename H>
@@ -73,8 +73,8 @@ float HashMapLL<K, V, H>::getLoadFactor() { return _loadFactor; }
 template <typename K, typename V, typename H>
 V HashMapLL<K, V, H>::put(const K &key, const V &value) {
     size_t hashValue = _hasher(key) % _capacity;
-    HashNode<K, V> *entry = _buckets[hashValue];
-    HashNode<K, V> *prev = nullptr;
+    HashMapEntryLL<K, V> *entry = _buckets[hashValue];
+    HashMapEntryLL<K, V> *prev = nullptr;
 
     while (entry != nullptr && entry->getKey() != key) {
         prev = entry;
@@ -82,8 +82,8 @@ V HashMapLL<K, V, H>::put(const K &key, const V &value) {
     }
 
     if (entry == nullptr) {
-        if (prev == nullptr) _buckets[hashValue] = new HashNode<K, V>(key, value);
-        else prev->setNext(new HashNode<K, V>(key, value));
+        if (prev == nullptr) _buckets[hashValue] = new HashMapEntryLL<K, V>(key, value);
+        else prev->setNext(new HashMapEntryLL<K, V>(key, value));
 
         _size++;
         if (this->threshold() < _size) { this->rehash(); }
@@ -98,7 +98,7 @@ V HashMapLL<K, V, H>::put(const K &key, const V &value) {
 template <typename K, typename V, typename H>
 V HashMapLL<K, V, H>::get(const K &key) {
     size_t hashValue = _hasher(key) % _capacity;
-    HashNode<K, V> *entry = _buckets[hashValue];
+    HashMapEntryLL<K, V> *entry = _buckets[hashValue];
 
     while (entry != nullptr && entry->getKey() != key) entry = entry->getNext();
     if (entry == nullptr) throw std::out_of_range("KeyError: Given key does not exist in map");
@@ -108,8 +108,8 @@ V HashMapLL<K, V, H>::get(const K &key) {
 template <typename K, typename V, typename H>
 V HashMapLL<K, V, H>::remove(const K &key) {
     size_t hashValue = _hasher(key) % _capacity;
-    HashNode<K, V> *entry = _buckets[hashValue];
-    HashNode<K, V> *prev = nullptr;
+    HashMapEntryLL<K, V> *entry = _buckets[hashValue];
+    HashMapEntryLL<K, V> *prev = nullptr;
 
     while (entry != nullptr && entry->getKey() != key) {
         prev = entry;
@@ -149,7 +149,7 @@ V HashMapLL<K, V, H>::remove(const K &key) {
 template <typename K, typename V, typename H>
 bool HashMapLL<K, V, H>::containsKey(const K &key) {
     size_t hashValue = _hasher(key) % _capacity;
-    HashNode<K, V> *entry = _buckets[hashValue];
+    HashMapEntryLL<K, V> *entry = _buckets[hashValue];
     while (entry != nullptr && entry->getKey() != key) entry = entry->getNext();
 
     if (entry == nullptr) return false;
@@ -162,8 +162,8 @@ bool HashMapLL<K, V, H>::isEmpty() { return _size == 0; }
 template <typename K, typename V, typename H>
 void HashMapLL<K, V, H>::clear() {
     for (size_t i = 0; i < _capacity; i++) {
-        HashNode<K, V> *current = _buckets[i];
-        HashNode<K, V> *helper;
+        HashMapEntryLL<K, V> *current = _buckets[i];
+        HashMapEntryLL<K, V> *helper;
 
         while (current != nullptr) {
             helper = current;
@@ -182,13 +182,13 @@ size_t HashMapLL<K, V, H>::threshold() { return static_cast<size_t>(_capacity * 
 template <typename K, typename V, typename H>
 void HashMapLL<K, V, H>::rehash() {
     size_t prevCapacity = _capacity; _capacity *= 2;
-    HashNode<K, V> **temp = _buckets;
-    _buckets = new HashNode<K, V> *[_capacity]();
+    HashMapEntryLL<K, V> **temp = _buckets;
+    _buckets = new HashMapEntryLL<K, V> *[_capacity]();
     _size = 0;
 
     for (size_t i = 0; i < prevCapacity; i++) {
-        HashNode<K, V> *current = temp[i];
-        HashNode<K, V> *helper;
+        HashMapEntryLL<K, V> *current = temp[i];
+        HashMapEntryLL<K, V> *helper;
 
         while (current != nullptr) {
             this->put(current->getKey(), current->getValue());
