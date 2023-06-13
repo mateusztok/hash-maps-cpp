@@ -1,12 +1,11 @@
 #pragma once
 
 #include "HashMapEntryLL.h"
-#include "Hasher.h"
 #include "Constants.h"
 
 #include <iostream>
 
-template <typename K, typename V, typename H = Hasher<K>>
+template <typename K, typename V, typename H = std::hash<K>>
 class HashMapLL {
 private:
     HashMapEntryLL<K, V> **_buckets;

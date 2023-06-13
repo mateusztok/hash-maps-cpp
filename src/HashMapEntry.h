@@ -13,6 +13,7 @@ public:
     K getKey();
     V getValue();
     void setValue(const V &value);
+    void setKey(const K &key);
 };
 
 template <typename K, typename V>
@@ -29,3 +30,6 @@ V HashMapEntry<K, V>::getValue() { return _value; }
 
 template <typename K, typename V>
 void HashMapEntry<K, V>::setValue(const V &value) { _value = value; }
+
+template <typename K, typename V>
+void HashMapEntry<K, V>::setKey(const K &key) { _key = key; }

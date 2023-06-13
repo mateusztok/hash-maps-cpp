@@ -1,12 +1,11 @@
 #pragma once
 
 #include "HashMapEntryRH.h"
-#include "Hasher.h"
 #include "Constants.h"
 
 #include <cmath>
 
-template <typename K, typename V, typename H = Hasher<K>>
+template <typename K, typename V, typename H = std::hash<K>>
 class HashMapRH {
 private:
     HashMapEntryRH<K, V> **_buckets;
