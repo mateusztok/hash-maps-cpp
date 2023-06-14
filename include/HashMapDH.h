@@ -43,8 +43,8 @@ public:
 };
 
 template <typename K, typename V, typename H>
-HashMapDH<K, V, H>::HashMapDH() : _capacity(constants::DEFAULT_CAPACITY), _loadFactor(constants::DEFAULT_LOAD_FACTOR),
-_size(0) {
+HashMapDH<K, V, H>::HashMapDH() : _loadFactor(constants::DEFAULT_LOAD_FACTOR), _size(0) {
+    _capacity = getNextPrime(constants::DEFAULT_CAPACITY);
     _buckets = new HashMapEntryDH<K, V>[_capacity]();
     _how_much_free = _capacity;
 }
