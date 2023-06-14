@@ -19,5 +19,5 @@ set(ALL_TARGETS
         )
 
 foreach(name ${ALL_TARGETS})
-    target_link_libraries(${name} PRIVATE Catch2::Catch2WithMain)
+    target_link_libraries(${name} PRIVATE hashmaps Catch2::Catch2WithMain)
 endforeach()

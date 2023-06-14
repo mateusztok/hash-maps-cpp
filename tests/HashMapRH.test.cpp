@@ -1,4 +1,4 @@
-#include "../src/HashMapRH.h"
+#include <HashMapRH.h>
 
 #include <catch2/catch_test_macros.hpp>
 

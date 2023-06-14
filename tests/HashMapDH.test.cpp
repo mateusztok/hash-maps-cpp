@@ -1,4 +1,4 @@
-#include "../src/HashMapDH.h"
+#include <HashMapDH.h>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -8,7 +8,7 @@ TEST_CASE("Creating HashMapDH of given capacities and load factors", "[HashMapDH
     SECTION("Using default capacity") {
         map = new HashMapDH<int, int>();
         REQUIRE(map->isEmpty());
-        REQUIRE(map->getCapacity() == 31);
+        REQUIRE(map->getCapacity() == 37);
         REQUIRE(map->getSize() == 0);
     }
 
