@@ -120,16 +120,18 @@ V HashMapRH<K, V, H>::remove(const K &key) {
     delete _buckets[idx];
     _size--;
 
-    size_t itr = idx + 1;
-    HashMapEntryRH<K, V> *next = _buckets[itr % _capacity];
-    while (next != nullptr && next->getPSL() > 0) {
-        next->setPSL(next->getPSL() - 1);
-
-        std::swap(_buckets[(itr - 1) % _capacity], next);
-        itr++;
+    HashMapEntryRH<K, V> *next; int itr;
+    while (true) {
+        itr = idx + 1;
         next = _buckets[itr % _capacity];
+        if (next == nullptr) break;
+        if (next->getPSL() <= 0) break;
+
+        next->setPSL(next->getPSL() - 1);
+        _buckets[idx % _capacity] = next;
+        _buckets[itr % _capacity] = nullptr;
+        idx = itr;
     }
-    _buckets[itr - 1] = nullptr;
 
     return rtnValue;
 }

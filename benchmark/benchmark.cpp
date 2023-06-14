@@ -98,6 +98,14 @@ std::vector<std::string> analyse(const std::vector<std::vector<std::string>>& da
             }
             stop = std::chrono::high_resolution_clock::now();
             duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            std::sprintf(buffer,
+                         "%s,%d,%.2f,%s,%lld",
+                         "DH",
+                         value,
+                         loadFactor,
+                         "put",
+                         duration.count());
+            results.push_back(convertToString(buffer));
 
             start = std::chrono::high_resolution_clock::now();
             for (size_t e = 0; e < value; e++) {
@@ -139,6 +147,21 @@ std::vector<std::string> analyse(const std::vector<std::vector<std::string>>& da
 
             start = std::chrono::high_resolution_clock::now();
             for (size_t e = 0; e < value; e++) {
+                hashMapDH->containsKey(copiedData[e][0]);
+            }
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            std::sprintf(buffer,
+                         "%s,%d,%.2f,%s,%lld",
+                         "DH",
+                         value,
+                         loadFactor,
+                         "containsKey",
+                         duration.count());
+            results.push_back(convertToString(buffer));
+
+            start = std::chrono::high_resolution_clock::now();
+            for (size_t e = 0; e < value; e++) {
                 hashMapRH->containsKey(copiedData[e][0]);
             }
             stop = std::chrono::high_resolution_clock::now();
@@ -167,6 +190,19 @@ std::vector<std::string> analyse(const std::vector<std::vector<std::string>>& da
             results.push_back(convertToString(buffer));
 
             start = std::chrono::high_resolution_clock::now();
+            hashMapDH->containsKey("im-not-existing");
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            std::sprintf(buffer,
+                         "%s,%d,%.2f,%s,%lld",
+                         "DH",
+                         value,
+                         loadFactor,
+                         "containsKeyFailed",
+                         duration.count());
+            results.push_back(convertToString(buffer));
+
+            start = std::chrono::high_resolution_clock::now();
             hashMapLL->containsKey("im-not-existing");
             stop = std::chrono::high_resolution_clock::now();
             duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -180,6 +216,7 @@ std::vector<std::string> analyse(const std::vector<std::vector<std::string>>& da
             results.push_back(convertToString(buffer));
 
             // Removing elements from hash maps and benchmarking performance
+            start = std::chrono::high_resolution_clock::now();
             for (size_t e = 0; e < value; e++) {
                 hashMapLL->remove(copiedData[e][0]);
             }
@@ -188,6 +225,21 @@ std::vector<std::string> analyse(const std::vector<std::vector<std::string>>& da
             std::sprintf(buffer,
                          "%s,%d,%.2f,%s,%lld",
                          "LL",
+                         value,
+                         loadFactor,
+                         "remove",
+                         duration.count());
+            results.push_back(convertToString(buffer));
+
+            start = std::chrono::high_resolution_clock::now();
+            for (size_t e = 0; e < value; e++) {
+                hashMapDH->remove(copiedData[e][0]);
+            }
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            std::sprintf(buffer,
+                         "%s,%d,%.2f,%s,%lld",
+                         "DH",
                          value,
                          loadFactor,
                          "remove",

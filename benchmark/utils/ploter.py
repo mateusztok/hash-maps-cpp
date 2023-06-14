@@ -120,8 +120,8 @@ def main() -> None:
                 plt.plot(x, list(map(lambda ns: ns / 1000000, ll.get_average(operation))),
                          label=ll.name, linestyle='-', marker='o', markersize=3.5)
                 plt.plot(x, list(map(lambda ns: ns / 1000000, dh.get_average(operation))),
-                         label=rh.name, linestyle='-', marker='o', markersize=3.5)
-                plt.plot(x, list(map(lambda ns: ns / 1000000, dh.get_average(operation))),
+                         label=dh.name, linestyle='-', marker='o', markersize=3.5)
+                plt.plot(x, list(map(lambda ns: ns / 1000000, rh.get_average(operation))),
                          label=rh.name, linestyle='-', marker='o', markersize=3.5)
                 plt.ylabel('Time [ms]')
             plt.xticks(x)
@@ -129,6 +129,7 @@ def main() -> None:
             plt.legend()
             plt.xlabel('Number of entries in hash map')
             plt.title(f'{operation.value} (load factor {lf})', fontweight='bold')
+            plt.savefig(f'./assets/{"-".join(operation.value.split(" "))}-lf{lf}.png') if args.save else None
             plt.show()
 
 
