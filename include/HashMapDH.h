@@ -106,10 +106,10 @@ template <typename K, typename V, typename H>
 V HashMapDH<K, V, H>::put(const K& key, const V& value) {
     size_t hashValue = _hasher(key) % _capacity;
     size_t first_a = -1;
-
+  
     while (_buckets[hashValue].getStatus() != 'f' && _buckets[hashValue].getKey() != key) {
         if (_buckets[hashValue].getStatus() == 'a' && first_a == -1) { first_a = hashValue; }
-        hashValue = (hashValue + (_hasher(key) % (_capacity - 1))) % _capacity;
+        hashValue = (hashValue + 1 + (_hasher(key) % (_capacity - 1))) % _capacity;
     }
 
     if (_buckets[hashValue].getKey() != key) {
@@ -138,7 +138,7 @@ V HashMapDH<K, V, H>::get(const K& key) {
         if (_buckets[hashValue].getKey() == key) {
             return _buckets[hashValue].getValue();
         }
-        hashValue = (hashValue + _hasher(key) % (_capacity - 1)) % _capacity;
+        hashValue = (hashValue + 1 + _hasher(key) % (_capacity - 1)) % _capacity;
     }
     throw std::out_of_range("KeyError: Given key does not exist in map");
 }
@@ -156,7 +156,7 @@ V HashMapDH<K, V, H>::remove(const K& key) {
             _size--;
             return rtnValue;
         }
-        hashValue = (hashValue + _hasher(key) % (_capacity - 1)) % _capacity;
+        hashValue = (hashValue + 1 + _hasher(key) % (_capacity - 1)) % _capacity;
     }
     throw std::out_of_range("KeyError: Given key does not exist in map");
 }
@@ -169,7 +169,7 @@ bool HashMapDH<K, V, H>::containsKey(const K& key) {
         if (_buckets[hashValue].getKey() == key) {
             return true;
         }
-        hashValue = (hashValue + _hasher(key) % (_capacity - 1)) % _capacity;
+        hashValue = (hashValue + 1 + _hasher(key) % (_capacity - 1)) % _capacity;
     }
     return false;
 }
@@ -189,8 +189,9 @@ void HashMapDH<K, V, H>::clear() {
 }
 
 template <typename K, typename V, typename H>
-size_t HashMapDH<K, V, H>::threshold() { return static_cast<size_t>(_capacity * _loadFactor);
-     }
+size_t HashMapDH<K, V, H>::threshold() {
+    return static_cast<size_t>(_capacity * _loadFactor);
+}
 
 template <typename K, typename V, typename H>
 void HashMapDH<K, V, H>::rehash() {
@@ -200,16 +201,17 @@ void HashMapDH<K, V, H>::rehash() {
     _buckets = new HashMapEntryDH<K, V>[_capacity]();
     _size = 0;
     _how_much_free = _capacity;
-
+    
     for (size_t i = 0; i < _capacity; i++) {
         _buckets[i].setStatus('f');
     }
-
+   
     for (size_t i = 0; i < prevCapacity; i++) {
 
         if (temp[i].getStatus() == 'o') {
-            this->put(temp[i].getKey(), temp[i].getValue());
+            put(temp[i].getKey(), temp[i].getValue());
         }
     }
+    
     delete[]temp;
 }
