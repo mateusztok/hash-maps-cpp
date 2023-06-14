@@ -1,4 +1,0 @@
-# ninja log v5
-1	74	1686746189468493191	build.ninja	31ef655833c8f780
-3	525	1686704044295334959	CMakeFiles/hashmapsBenchmark.dir/benchmark.cpp.o	728977e4ddeb2b35
-525	571	1686704044343269482	hashmapsBenchmark	4135ab6f682cda95
